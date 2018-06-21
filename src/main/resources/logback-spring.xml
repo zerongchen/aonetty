@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<configuration>
+    
+    <!-- 从高到地低 OFF 、 FATAL 、 ERROR 、 WARN 、 INFO 、 DEBUG 、 TRACE 、 ALL -->
+    <!--<property name="consoleLayoutPattern"    -->
+        <!--value="%-20(%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%thread] [%logger] [%-4relative]) %msg%n" />-->
+    
+    <property name="fileLayoutPattern"    
+        value=" %d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %logger \\(%F:%L\\)  -  %msg %n" />
+  
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">  
+        <layout class="ch.qos.logback.classic.PatternLayout">  
+            <pattern>${fileLayoutPattern}</pattern>
+        </layout>  
+    </appender>  
+  
+    <appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ZF_HOME}/logs/zf-web/eureka_info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${ZF_HOME}/logs/eureka_info.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <!-- 此处30天-->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>  
+        <layout class="ch.qos.logback.classic.PatternLayout">  
+            <Pattern>${fileLayoutPattern}</Pattern>
+        </layout>  
+    </appender>  
+  
+	<logger name="com.netty.aonet" level="DEBUG"/>
+	
+	<root>
+		<level value="INFO" /> <!-- 系统全局日志输出最低级别，但不包括包 -->
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="LOG_FILE" />
+	</root>
+  
+</configuration> 
