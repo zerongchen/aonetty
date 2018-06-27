@@ -42,6 +42,7 @@ public class MulitiplexerTimeServer implements Runnable{
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -53,6 +54,7 @@ public class MulitiplexerTimeServer implements Runnable{
     public void run() {
         while (!stop){
             try {
+                //selector 休眠时间
                 selector.select(1000);
                 Set<SelectionKey> selectionKeys = selector.selectedKeys();
                 Iterator<SelectionKey> it = selectionKeys.iterator();
@@ -90,12 +92,12 @@ public class MulitiplexerTimeServer implements Runnable{
         if(key.isValid()){
             if(key.isAcceptable()){
                 //accept the new connection
-                ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+                ServerSocketChannel sc = (ServerSocketChannel) key.channel();
                 try {
-                    SocketChannel channel = serverSocketChannel.accept();
+                    SocketChannel channel = sc.accept();
                     channel.configureBlocking(false);
                     //add new connection to selector
-                    serverSocketChannel.register(selector, Selection.ACC_OPEN);
+                    channel.register(selector, SelectionKey.OP_READ);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
