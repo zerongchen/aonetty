@@ -1,7 +1,6 @@
 package com.netty.aonet.nio;
 
-import org.springframework.expression.spel.ast.Selection;
-import org.springframework.util.StringUtils;
+import io.netty.util.internal.StringUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -134,7 +133,7 @@ public class MulitiplexerTimeServer implements Runnable{
     }
 
     private void doWrite( SocketChannel sc, String currentTime ) {
-        if(!StringUtils.isEmpty(currentTime)){
+        if(!StringUtil.isNullOrEmpty(currentTime)){
             byte[] bytes = currentTime.getBytes();
             ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
             writeBuffer.put(bytes);

@@ -1,6 +1,6 @@
 package com.netty.aonet.aio;
 
-import org.springframework.util.StringUtils;
+import io.netty.util.internal.StringUtil;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -39,7 +39,7 @@ public class ReadCompletionHandler implements CompletionHandler<Integer,ByteBuff
     }
 
     private void doWrite( String currentTime ) {
-        if(!StringUtils.isEmpty(currentTime)){
+        if(!StringUtil.isNullOrEmpty(currentTime)){
             byte[] bytes = currentTime.getBytes();
             ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);
             writeBuffer.put(bytes);

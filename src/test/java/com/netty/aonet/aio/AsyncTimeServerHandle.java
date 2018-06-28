@@ -1,7 +1,5 @@
 package com.netty.aonet.aio;
 
-import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;

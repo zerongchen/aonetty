@@ -15,7 +15,7 @@ public class TimeServerHandler extends ChannelDuplexHandler {
         ByteBuf buf = (ByteBuf)msg;
         byte[] bs = new byte[buf.readableBytes()];
         buf.readBytes(bs);
-        String body = new String (bs,"utf-8");
+        String body = new String (bs,"utf-8").substring(0,bs.length-System.getProperty("line.separator").length());
         System.out.println("the time server receive order is "+body);
         String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body)?new Date(System.currentTimeMillis()).toString():"BAD ORDER";
         ByteBuf byteBuf = Unpooled.copiedBuffer(currentTime.getBytes());

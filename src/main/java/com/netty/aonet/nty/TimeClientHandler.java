@@ -3,15 +3,21 @@ package com.netty.aonet.nty;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.EventExecutorGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TimeClientHandler extends ChannelDuplexHandler {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    //after
+    private int counter;
+    private byte[] req;
+
+    TimeClientHandler(){
+        req=("QUERY TIME ORDER"+System.getProperty("line.separator")).getBytes();
+    }
 
     /**
      * client 链接成功后会调用该方法
@@ -20,7 +26,12 @@ public class TimeClientHandler extends ChannelDuplexHandler {
      */
     @Override
     public void channelActive( ChannelHandlerContext ctx ) throws Exception {
-        ctx.writeAndFlush( Unpooled.copiedBuffer("QUERY TIME ORDER".getBytes()));
+        ByteBuf message = null;
+        for (int i=0;i<100;i++){
+            message=Unpooled.buffer(req.length);
+            message.writeBytes(req);
+            ctx.writeAndFlush(message);
+        }
     }
 
     /**
@@ -35,7 +46,7 @@ public class TimeClientHandler extends ChannelDuplexHandler {
         byte[] bs = new byte[b.readableBytes()];
         b.readBytes(bs);
         String body = new String(bs,"utf-8");
-        System.out.println("now is "+ body);
+        System.out.println("now is "+ body +" ; the counter is "+counter++);
     }
 
     /**
