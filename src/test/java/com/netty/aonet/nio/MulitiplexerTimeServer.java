@@ -90,6 +90,7 @@ public class MulitiplexerTimeServer implements Runnable{
     private void handleInput( SelectionKey key ) {
         //处理请求
         if(key.isValid()){
+            //处理链接成功的
             if(key.isAcceptable()){
                 //accept the new connection
                 ServerSocketChannel sc = (ServerSocketChannel) key.channel();
@@ -104,6 +105,7 @@ public class MulitiplexerTimeServer implements Runnable{
 
             }
             if(key.isReadable()){
+                //处理可读数据
                 //read data
                 SocketChannel sc = (SocketChannel) key.channel();
                 ByteBuffer bf = ByteBuffer.allocate(1024);
