@@ -30,6 +30,7 @@ public class TimeClientHandler extends ChannelDuplexHandler {
         for (int i=0;i<100;i++){
             message=Unpooled.buffer(req.length);
             message.writeBytes(req);
+            System.out.println(new String(req,"utf-8")+" ------------- ");
             ctx.writeAndFlush(message);
         }
     }
@@ -42,10 +43,11 @@ public class TimeClientHandler extends ChannelDuplexHandler {
      */
     @Override
     public void channelRead( ChannelHandlerContext ctx, Object msg ) throws Exception {
-        ByteBuf b = (ByteBuf) msg;
-        byte[] bs = new byte[b.readableBytes()];
-        b.readBytes(bs);
-        String body = new String(bs,"utf-8");
+//        ByteBuf b = (ByteBuf) msg;
+//        byte[] bs = new byte[b.readableBytes()];
+//        b.readBytes(bs);
+//        String body = new String(bs,"utf-8");
+        String body = (String) msg;
         System.out.println("now is "+ body +" ; the counter is "+counter++);
     }
 
