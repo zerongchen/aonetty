@@ -1,6 +1,7 @@
 package com.netty.aonet.seri;
 
-import com.netty.aonet.nty.TimeServer;
+import com.netty.aonet.seri.model.SubcribeReq;
+import com.netty.aonet.seri.model.SubcribeResp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -48,9 +49,29 @@ public class SubReqServer {
                                 .addLast(new ChannelDuplexHandler(){
                                     @Override
                                     public void channelRead( ChannelHandlerContext ctx, Object msg ) throws Exception {
-                                        super.channelRead(ctx, msg);
+                                        SubcribeReq req = (SubcribeReq)msg;
+                                        if("czr".equalsIgnoreCase(req.getName())){
+                                            System.out.print("receive order is "+req.toString());
+                                            ctx.writeAndFlush(rep(req.getReqId()));
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                                        super.exceptionCaught(ctx, cause);
+                                        cause.printStackTrace();
+                                    }
+
+                                    private SubcribeResp rep(Integer id){
+                                        SubcribeResp re = new SubcribeResp();
+                                        re.setReqId(id);
+                                        re.setRespCode("0");
+                                        re.setDesc("netty test");
+                                        return re;
                                     }
                                 });
+
                     }
                 });
         //绑定端口，同步等待成功
