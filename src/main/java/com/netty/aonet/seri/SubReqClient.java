@@ -1,5 +1,9 @@
 package com.netty.aonet.seri;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+
 public class SubReqClient {
 
     public static void main(String[] args){
@@ -13,5 +17,10 @@ public class SubReqClient {
     }
 
     private void connect(int port,String host) {
+        EventLoopGroup boos = new NioEventLoopGroup();
+        ServerBootstrap b = new ServerBootstrap();
+
+
+
     }
 }
