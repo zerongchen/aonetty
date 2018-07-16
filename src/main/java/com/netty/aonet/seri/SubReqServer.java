@@ -51,7 +51,7 @@ public class SubReqServer {
                                     public void channelRead( ChannelHandlerContext ctx, Object msg ) throws Exception {
                                         SubcribeReq req = (SubcribeReq)msg;
                                         if("czr".equalsIgnoreCase(req.getName())){
-                                            System.out.print("receive order is "+req.toString());
+                                            System.out.println("receive order is "+req.toString());
                                             ctx.writeAndFlush(rep(req.getReqId()));
 
                                         }
