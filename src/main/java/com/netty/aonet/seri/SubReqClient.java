@@ -32,8 +32,12 @@ public class SubReqClient {
                     @Override
                     protected void initChannel( SocketChannel socketChannel ) throws Exception {
                         socketChannel.pipeline()
-                                .addLast(new ObjectDecoder(1024*1024, ClassResolvers.cacheDisabled(this.getClass().getClassLoader())))
-                                .addLast(new ObjectEncoder())
+                                //JDK  Serializable
+                                /*.addLast(new ObjectDecoder(1024*1024, ClassResolvers.cacheDisabled(this.getClass().getClassLoader())))
+                                .addLast(new ObjectEncoder())*/
+                                // JBoss marshalling
+                                .addLast(MarshallingCodeCFactory.buildMarshallingDecoder())
+                                .addLast(MarshallingCodeCFactory.buildMarshallingEncoder())
                                 .addLast(new ChannelDuplexHandler(){
                                     @Override
                                     public void channelActive( ChannelHandlerContext ctx ) throws Exception {

@@ -7,11 +7,17 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.marshalling.CompatibleMarshallingDecoder;
+import io.netty.handler.codec.marshalling.MarshallingDecoder;
+import io.netty.handler.codec.marshalling.MarshallingEncoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import org.jboss.marshalling.MarshallerFactory;
+
+import java.lang.management.ManagementFactory;
 
 public class SubReqServer {
 
@@ -44,8 +50,12 @@ public class SubReqServer {
                     @Override
                     protected void initChannel( SocketChannel channel ) throws Exception {
                         channel.pipeline()
-                                .addLast(new ObjectDecoder(1024*1024, ClassResolvers.weakCachingResolver(this.getClass().getClassLoader())))
-                                .addLast(new ObjectEncoder())
+                                //JDK Serializable
+                                /*.addLast(new ObjectDecoder(1024*1024, ClassResolvers.weakCachingResolver(this.getClass().getClassLoader())))
+                                .addLast(new ObjectEncoder()) */
+                                // JBoss marshalling
+                                .addLast(MarshallingCodeCFactory.buildMarshallingDecoder())
+                                .addLast(MarshallingCodeCFactory.buildMarshallingEncoder())
                                 .addLast(new ChannelDuplexHandler(){
                                     @Override
                                     public void channelRead( ChannelHandlerContext ctx, Object msg ) throws Exception {
