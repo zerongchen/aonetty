@@ -47,6 +47,12 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.3</version>
 		</dependency>
+		<!-- jibx -->
+		<dependency>
+			<groupId>org.jibx</groupId>
+			<artifactId>jibx-bind</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.jboss.marshalling/jboss-marshalling -->
 		<!--marshalling 框架-->
