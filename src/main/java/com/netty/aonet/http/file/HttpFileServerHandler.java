@@ -8,14 +8,12 @@ import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 
 import javax.activation.MimetypesFileTypeMap;
-import java.awt.datatransfer.MimeTypeParseException;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.regex.Pattern;
 
-import static io.netty.handler.codec.http.HttpHeaderValues.CHARSET;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 
@@ -72,10 +70,11 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
             return;
         }
         long filelength = randomAccessFile.length();
-        HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK);
+        //不能用DefaultFullHttpResponse
+        HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK);
         setContentLength(response,filelength);
         setContentTypeHeader(response,file);
-        if (isKeedAlive(fullHttpRequest)){
+        if ( isKeepAlive(fullHttpRequest)){
             response.headers().set(CONNECTION,KEEP_ALIVE);
         }
         ctx.write(response);
@@ -96,12 +95,10 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
                 System.out.println("transfer progress complete");
             }
         });
-        ChannelFuture future1 = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-        if(!isKeedAlive(fullHttpRequest)){
-            future1.addListener(ChannelFutureListener.CLOSE);
+        ChannelFuture lastfuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+        if(!isKeepAlive(fullHttpRequest)){
+            lastfuture.addListener(ChannelFutureListener.CLOSE);
         }
-
-
     }
     @Override
     public void exceptionCaught( ChannelHandlerContext ctx, Throwable cause ) throws Exception {
@@ -115,17 +112,19 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
     private static final Pattern INSECURE_URL = Pattern.compile(".*[<>&\"].*");
     private static final Pattern ALLOWFILENAME = Pattern.compile("[A-Za-z0-9][-_A-Za-z0-9\\.]*");
 
-    private boolean isKeedAlive( FullHttpRequest request ) {
-        return request.headers().contains(KEEP_ALIVE);
+    private boolean isKeepAlive( FullHttpRequest request ) {
+        return HttpUtil.isKeepAlive(request);
+//        return request.headers().contains(KEEP_ALIVE);
     }
 
-    private void setContentTypeHeader( HttpResponse response, File file ) {
+    private void  setContentTypeHeader( HttpResponse response, File file ) {
         MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
         response.headers().set(CONTENT_TYPE,mimetypesFileTypeMap.getContentType(file.getPath()));
     }
 
     private void setContentLength( HttpResponse response, long filelength ) {
-        response.headers().set(CONTENT_LENGTH,filelength);
+//        response.headers().set(CONTENT_LENGTH,filelength);
+        HttpUtil.setContentLength(response, filelength);
     }
 
     private void sendRedirct( ChannelHandlerContext ctx, String s ) {
@@ -136,16 +135,20 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 
     private void sendList( ChannelHandlerContext ctx, File dir ) {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK);
-        response.headers().set(CONTENT_TYPE,"text/html;charset=utf-8");
+        response.headers().set(CONTENT_TYPE,"text/html;charset=UTF-8");
         StringBuilder buf = new StringBuilder();
         String dirPath = dir.getPath();
-        buf.append("<!DOCTYPE html\r\n");
+        buf.append("<!DOCTYPE html>\r\n");
         buf.append("<html><head><title>");
         buf.append(dirPath);
-        buf.append("目录");
-        buf.append("</title></head>");
-        buf.append("<body>\r\n");
-        buf.append("<h3>\r\n").append("<ul>").append("<li> 链接：<a href=''></a> </li>\r\n");
+        buf.append("目录:");
+        buf.append("</title></head>\r\n");
+
+        buf.append("<h3>");
+        buf.append(dirPath).append(" 目录：");
+        buf.append("</h3>\r\n");
+        buf.append("<ul>");
+        buf.append("<li><a href=' ../'</a>上一级</li>\r\n");
         for (File f : dir.listFiles()){
             if(f.isHidden() || !f.canRead()){
                 continue;
@@ -154,7 +157,11 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
             if(!ALLOWFILENAME.matcher(name).matches()){
                 continue;
             }
-            buf.append("<li> 连接:<a href=\">").append(name).append("\"").append(name).append("</a></li>\r\n");
+            buf.append("<li>   <a href=\"");
+            buf.append(name);
+            buf.append("\">");
+            buf.append(name);
+            buf.append("</a></li>\r\n");
         }
         buf.append("</ul></body></html>\r\n");
         ByteBuf buffer = Unpooled.copiedBuffer(buf, CharsetUtil.UTF_8);
@@ -164,6 +171,11 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
 
     }
 
+    /**
+     * 校验路径
+     * @param uri
+     * @return
+     */
     private String sanitizeUri( String uri ) {
 
         try {
@@ -192,7 +204,7 @@ public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpR
                 ){
             return null;
         }
-        return System.getProperty("user.dir")+File.separator+uri;
+        return "E:"+uri;
     }
 
     private void sendError( ChannelHandlerContext ctx, HttpResponseStatus status ) {
