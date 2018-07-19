@@ -6,7 +6,8 @@ E.g:TCP/IP 写入数据过程中，接收端不能及时消费就会导致window
 (selector JDK1.7采用epoll()(JDK1.7之前采用select/poll) ,epoll没有链接句柄数的限制,只受限于操作系统做大句柄数，或者对单个进程的句柄数，以为着selector线程可以处理成千上万个客户端链接)
 * 自己写NIO难度大，不好维护,重连，闪退，半包读写，缓存失败，异常码流等原因处理难度大，建议netty
 * netty即可作为client，也可以作为service，同时支持UDP和异步文件传输
-
+* HTTP+FileServer
+* HTTP+XML (HTTP+GSON)
 
 
 
