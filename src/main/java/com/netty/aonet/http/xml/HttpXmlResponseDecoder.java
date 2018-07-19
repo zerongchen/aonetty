@@ -6,6 +6,7 @@ import com.netty.aonet.http.xml.model.HttpXmlResponse;
 import com.netty.aonet.http.xml.model.Order;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.CharsetUtil;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class HttpXmlResponseDecoder extends AbstractHttpXmlDecoder {
 
     @Override
     protected void decode( ChannelHandlerContext ctx, Object o, List out) throws Exception {
-        DefaultFullHttpResponse msg = (DefaultFullHttpResponse)o;
+        FullHttpResponse msg = (FullHttpResponse)o;
 
         String content =  msg.content().toString(CharsetUtil.UTF_8);
         Gson gson = new Gson();
