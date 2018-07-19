@@ -1,9 +1,13 @@
 package com.netty.aonet.http.xml;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.netty.aonet.http.xml.model.HttpXmlRequest;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import io.netty.util.CharsetUtil;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -15,7 +19,10 @@ public class HttpXmlRequestEncoder extends AbstractHttpXmlEncoder {
         HttpXmlRequest msg = (HttpXmlRequest)o;
         //首先调用父类的encode0，将业务需要发送的POJO对象Order实例通过JiBx序列化为XML字符串
         //随后将它封装成Netty的ByteBuf。
-        ByteBuf body = encode0(ctx, msg.getBody());
+//        ByteBuf body = encode0(ctx, msg.getBody());
+        Gson gson = new Gson();
+
+        ByteBuf body = Unpooled.copiedBuffer(gson.toJson(msg.getBody()).getBytes());
         FullHttpRequest request = msg.getRequest();
         //对消息头进行判断，如果业务自定义和定制了消息头，则使用业务侧设置的HTTP消息头，
         //如果业务侧没有设置，则构造新的HTTP消息头。

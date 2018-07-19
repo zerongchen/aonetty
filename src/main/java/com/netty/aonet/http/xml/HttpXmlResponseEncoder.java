@@ -1,7 +1,9 @@
 package com.netty.aonet.http.xml;
 
+import com.google.gson.Gson;
 import com.netty.aonet.http.xml.model.HttpXmlResponse;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -17,7 +19,9 @@ public class HttpXmlResponseEncoder extends AbstractHttpXmlEncoder {
 
     protected void encode( ChannelHandlerContext ctx, Object o, List out) throws Exception {
         HttpXmlResponse msg = (HttpXmlResponse) o;
-        ByteBuf body = encode0(ctx, msg.getResult());
+//        ByteBuf body = encode0(ctx, msg.getResult());
+        Gson gson = new Gson();
+        ByteBuf body = Unpooled.copiedBuffer(gson.toJson(msg.getResult()).getBytes());
         FullHttpResponse response = msg.getHttpResponse();
         if (response == null) {
             response = new DefaultFullHttpResponse(HTTP_1_1, OK, body);

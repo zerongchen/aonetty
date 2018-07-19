@@ -1,11 +1,15 @@
 package com.netty.aonet.http.xml;
 
+import com.google.gson.Gson;
 import com.netty.aonet.http.xml.model.HttpXmlRequest;
+import com.netty.aonet.http.xml.model.Order;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.apache.tools.ant.taskdefs.condition.Or;
 
 import java.util.List;
 
@@ -31,7 +35,11 @@ public class HttpXmlRequestDecoder extends AbstractHttpXmlDecoder {
             return;
         }
         //通过HttpXmlRequest和反序列化后的Order对象构造HttpXmlRequest实例，最后将它添加到解码结果List列表中。
-        HttpXmlRequest request = new HttpXmlRequest(arg1, decode0(arg0,arg1.content()));
+//        HttpXmlRequest request = new HttpXmlRequest(arg1, decode0(arg0,arg1.content()));
+        String content =  arg1.content().toString(CharsetUtil.UTF_8);
+        Gson gson = new Gson();
+        Order order = gson.fromJson(content, Order.class);
+        HttpXmlRequest request = new HttpXmlRequest(arg1, order);
         arg2.add(request);
     }
 
