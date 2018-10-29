@@ -56,10 +56,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     private void handleWebSocketFrame(ChannelHandlerContext ctx , WebSocketFrame frame){
+        //关闭链路指令
         if (frame instanceof CloseWebSocketFrame){
             socketServerHandshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
             return;
         }
+        //PING 消息
         if (frame instanceof PingWebSocketFrame){
             ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
             return;
